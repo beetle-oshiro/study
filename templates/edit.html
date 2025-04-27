@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+
+{% block title %}編集フォーム{% endblock %}
+
+{% block content %}
+<h2>編集フォーム</h2>
+<form method="POST" action="/update/{{ id }}"> <!-- 編集する（した）IDをURLに付ける -->
+  <label>名前：</label><br>
+  <input type="text" name="name" value="{{ item.name }}"><br><br> <!-- 現状（編集前）のデータをテキストボックスに入れる -->
+  <label>カテゴリー：</label>
+  <select name="category" id="id_select_category">
+    <option value="学習" {% if item.category=="学習" %}selected{% endif %}>学習</option> <!-- 現状（編集前）で選択されているカテゴリーを選択させる -->
+    <option value="雑談" {% if item.category=="雑談" %}selected{% endif %}>雑談</option> <!-- ↑に同じ -->
+    <option value="日記" {% if item.category=="日記" %}selected{% endif %}>日記</option> <!-- ↑に同じ -->
+  </select><br>
+
+  <label>メッセージ：</label><br>
+  <textarea name="message">{{ item.message }}</textarea><br><br> <!-- 現状（編集前）のデータをテキストエリアに入れる -->
+
+  <button type="submit">更新する</button>
+</form>
+{% endblock %}

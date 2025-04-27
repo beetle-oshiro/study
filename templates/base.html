@@ -1,0 +1,16 @@
+<!-- templates/base.html -->
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}Flask App{% endblock %}</title>
+</head>
+<body>
+    <h1>デキスギ学習記録アプリ</h1>
+    <hr>
+    
+    {% block content %}
+    <!-- 各ページの中身が入る -->
+    {% endblock %}
+</body>
+</html>
