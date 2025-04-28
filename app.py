@@ -134,9 +134,8 @@ print("📋 取得されたレコード：", records)
 # Flaskサーバーを起動するかチェック（ファイルを直接実行したときだけ）
 if __name__ == "__main__":          #このファイルが直接実行されているか（"__main__"ならされている）
 
-    # Flaskアプリを起動
-    from wsgiref.handlers import CGIHandler
-    CGIHandler().run(app)
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host="0.0.0.0", port=port)
 
 
 
