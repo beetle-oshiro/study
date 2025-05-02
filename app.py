@@ -3,7 +3,7 @@
 from flask import Flask, render_template, request, json, redirect
 from datetime import datetime
 from data import load_json, save_json, data_stock, get_data_by_id
-from logic import register_data, filter_by_category, filter_by_keyword, sort_data, update_data, get_all_records, register_to_db, delete_from_db, update_record_in_db, get_record_by_id
+from logic import register_data, filter_by_category, filter_by_keyword, sort_data, update_data, get_all_records, register_to_db, delete_from_db, update_record_in_db, get_record_by_id, get_all_records_postgres, register_record_to_postgres, delete_record_from_postgres, get_record_by_id_postgres, update_record_in_postgres
 import os
 
 
@@ -35,12 +35,15 @@ def index():
 
     #データが送られてきていたら
     if request.method == "POST":
-        name, message, category, error = register_to_db(request.form) #requestにはブラウザから送られてきたリクエスト情報が全部詰まっている
+        name, message, category, error = register_record_to_postgres(request.form) #requestにはブラウザから送られてきたリクエスト情報が全部詰まっている
         if not error:
             return redirect("/")  # ←ここでリダイレクト！
 
-    # データを JSONじゃなく DBから取得する場合
-    all_data = get_all_records(db_path)
+    # # データを JSONじゃなく DBから取得する場合
+    # all_data = get_all_records(db_path)
+    
+    # データを PostgreSQLから取得する場合
+    all_data = get_all_records_postgres()
 
     # 絞り込み処理（カテゴリフィルター）
     filtered_data = filter_by_category(all_data, filter_category)
@@ -66,7 +69,7 @@ def index():
 # =========================編集画面に情報を渡す=========================
 @app.route("/edit/<id>", methods=["GET"])
 def edit(id):
-    item = get_record_by_id(id)                                 #index.htmlから編集（edit）で送られてきたidに該当するデータをitemに入れる（ない場合はNone）
+    item = get_record_by_id_postgres(id)                        #index.htmlから編集（edit）で送られてきたidに該当するデータをitemに入れる（ない場合はNone）
     if item:                                                    #itemにデータが入っている場合（編集したいデータを見つけた）
         return render_template("edit.html", id=id, item=item)   #edit.htmlに編集したいデータとそのＩＤを送る
     return redirect("/")                                        #現在のページ（トップページ）へリダイレクトする
@@ -80,14 +83,14 @@ def update(id):
     message = request.form.get("message").strip()               #edit.htmlから更新（update）で送られてきたmessageに該当するデータを空白を抜いてmessageに入れる
     time = datetime.now().strftime("%Y-%m-%d %H:%M")            #現在の日時をtimeに入れる
 
-    update_record_in_db(id, name, category, message, time)      #更新したいデータのIDと名前、カテゴリー、メッセージを更新処理に送る
+    update_record_in_postgres(id, name, category, message, time)      #更新したいデータのIDと名前、カテゴリー、メッセージを更新処理に送る
     return redirect("/")                                        #現在のページ（トップページ）へリダイレクトする
 
 
 # =========================削除=========================
 @app.route("/delete/<id>", methods=["POST"])
 def delete(id):
-    delete_from_db(id)                                          #URLにつけて送られてきたIDを引数にして送る
+    delete_record_from_postgres(id)                             #URLにつけて送られてきたIDを引数にして送る
     return redirect("/")                                        #現在のページ（トップページ）へリダイレクトする
 
     # if id in data_stock:                                        #data_stock（辞書）の中に削除したいIDに該当するキーがある場合

@@ -2,6 +2,7 @@ from datetime import datetime
 from data import data_stock, save_json, get_next_id
 import sqlite3
 import os
+from db_connect import get_connection
 
 
 # =========================共通のファイルパス設定=========================
@@ -63,13 +64,78 @@ def insert_to_db(name, message, category, time):
     conn.close()
 
 
-# =========================データの削除（データベース）=========================
+
+
+# =========================登録処理（データがあるか？ある場合は登録）PostgreSQL版 =========================
+def register_record_to_postgres(form):
+    name = form.get("name", "").strip()
+    message = form.get("message", "").strip()
+    category = form.get("category", "").strip()
+    error = ""
+
+    if not name or not message or not category:
+        error = "すべての項目を入力してください！"
+        return name, message, category, error
+
+    time_str = datetime.now().strftime("%Y-%m-%d %H:%M")
+
+    try:
+        conn = get_connection()
+        cur = conn.cursor()
+        cur.execute("""
+            INSERT INTO records (name, message, category, time)
+            VALUES (%s, %s, %s, %s)
+        """, (name, message, category, time_str))
+        conn.commit()
+        conn.close()
+    except Exception as e:
+        error = f"登録中にエラーが発生しました：{e}"
+
+    return name, message, category, error
+
+
+
+# =========================PostgreSQLから全データ取得=========================
+
+def get_all_records_postgres():
+    conn = get_connection()
+    cur = conn.cursor()
+    cur.execute("SELECT id, name, message, category, time FROM records")  # テーブル名は今まで通り"records"
+    rows = cur.fetchall()
+    conn.close()
+
+    # データを辞書に整形
+    result = {}
+    for row in rows:
+        record_id = str(row[0])
+        result[record_id] = {
+            "name": row[1],
+            "message": row[2],
+            "category": row[3],
+            "time": row[4]
+        }
+    return result
+
+
+# =========================データの削除（データベース：MySQL）=========================
 def delete_from_db(record_id):
     conn = sqlite3.connect(os.path.normpath(db_path))
     cur = conn.cursor()
     cur.execute("DELETE FROM records WHERE id = ?", (record_id,))               #プレースホルダを使って安全に削除のSQLを実行
     conn.commit()
     conn.close()
+
+
+# =========================データの削除（データベース：PostgreSQL）=========================
+def delete_record_from_postgres(record_id):
+    try:
+        conn = get_connection()
+        cur = conn.cursor()
+        cur.execute("DELETE FROM records WHERE id = %s", (record_id,))
+        conn.commit()
+        conn.close()
+    except Exception as e:
+        print(f"❌ 削除中にエラーが発生しました：{e}")
 
 
 # =========================データの検索（データベース）=========================
@@ -98,7 +164,7 @@ def get_all_records(db_path):
     return result
 
 
-# =========================更新したいデータをデータベースから取ってくる =========================
+# =========================更新したいデータをデータベースから取ってくる（MySQL） =========================
 def get_record_by_id(record_id):
     conn = sqlite3.connect(os.path.normpath(db_path))
     conn.row_factory = sqlite3.Row
@@ -118,7 +184,7 @@ def get_record_by_id(record_id):
         return None
 
 
-# =========================更新処理（データベース）=========================
+# =========================更新処理（データベース：MySQL）=========================
 def update_record_in_db(record_id, name, category, message, time):
     conn = sqlite3.connect(os.path.normpath(db_path))
     cur = conn.cursor()
@@ -129,6 +195,45 @@ def update_record_in_db(record_id, name, category, message, time):
     """, (name, category, message, time, record_id))
     conn.commit()
     conn.close()
+
+
+# =========================更新したいデータをデータベースから取ってくる（PostgreSQL）=========================
+def get_record_by_id_postgres(record_id):
+    conn = get_connection()
+    cur = conn.cursor()
+    cur.execute("SELECT id, name, message, category, time FROM records WHERE id = %s", (record_id,))
+    row = cur.fetchone()
+    conn.close()
+
+    if row:
+        return {
+            "name": row[1],
+            "message": row[2],
+            "category": row[3],
+            "time": row[4]
+        }
+    else:
+        return None
+
+
+# =========================更新処理（データベース：PostgreSQL）=========================
+def update_record_in_postgres(record_id, name, category, message, time_str):
+    # record_id = int(record_id)
+    try:
+        conn = get_connection()
+        cur = conn.cursor()
+        cur.execute("""
+            UPDATE records
+            SET name = %s,
+                category = %s,
+                message = %s,
+                time = %s
+            WHERE id = %s
+        """, (name, category, message, time_str, record_id))
+        conn.commit()
+        conn.close()
+    except Exception as e:
+        print(f"❌ 更新中にエラーが発生しました：{e}")
 
 
 # =========================カテゴリーの絞り込み=========================
