@@ -1,0 +1,86 @@
+{% extends "base.html" %}
+
+{% block title %}アシスト機能{% endblock %}
+
+{% block content %}
+<div class="container text-center">
+    <h2 class="mb-4">🤖 学習アシストページ</h2>
+
+    <!-- 検索フォーム -->
+    <form method="GET" action="/assist" class="assist-form d-flex flex-wrap justify-content-center gap-3">
+
+        <!-- タグで絞り込み -->
+        <div class="d-flex align-items-center gap-2">
+            <label for="tag" class="form-label mb-0">タグで絞り込み：</label>
+            <select name="tag" id="tag" class="form-select">
+                <option value="">全て</option>
+                {% for tag in tags %}
+                <option value="{{ tag.name }}" {% if selected_tag==tag.name %}selected{% endif %}>{{ tag.name }}
+                </option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <!-- キーワード検索 -->
+        <div class="d-flex align-items-center gap-2">
+            <label for="keyword" class="form-label mb-0">🔍 キーワード：</label>
+            <input type="text" id="keyword" name="keyword" class="form-control" value="{{ keyword }}">
+        </div>
+
+        <!-- 検索ボタン -->
+        <div class="d-flex align-items-center">
+            <button type="submit" class="btn btn-primary">検索</button>
+        </div>
+
+    </form>
+
+
+    <!-- 結果表示 -->
+    {% if results %}
+    <h3>🔎 検索結果：</h3>
+    <ul>
+        {% for id, item in results.items() %}
+        <div class="card assist-card mb-4 p-3 shadow-sm">
+
+            <div class="mb-2 p-2 border rounded bg-light">
+                <strong>📌 ワード：</strong><br>
+                {{ item.word or "" }}
+            </div>
+
+            <div class="mb-2 p-2 border rounded bg-light">
+                <strong>📝 詳細：</strong><br>
+                {{ item.details or "" }}
+            </div>
+
+            <div class="mb-2 p-2 border rounded bg-light">
+                <strong>🗒 メモ：</strong><br>
+                {{ item.memo or "" }}
+            </div>
+
+            <div class="mb-2 p-2 border rounded bg-light">
+                <strong>🏷 タグ：</strong><br>
+                {{ item.tags | join(', ') }}
+            </div>
+
+            <p class="text-end text-muted"><small>⏰ 登録日時：{{ item.time }}</small></p>
+
+            <form method="GET" action="/edit/{{ id }}">
+                <button type="submit" class="btn btn-sm btn-warning mt-2">🛠 編集</button>
+            </form>
+        </div>
+        {% endfor %}
+    </ul>
+    {% elif keyword %}
+    <p>該当する結果はありませんでした。</p>
+    {% endif %}
+
+    <p>ここでは登録された情報をもとに、あなたの学習をアシストします。</p>
+    <ul>
+        <li>類似ワードの提案</li>
+        <li>タグからの絞り込み</li>
+        <li>過去の学習履歴の分析表示</li>
+    </ul>
+
+    <a href="/" class="btn btn-secondary mt-3">← トップへ戻る</a>
+</div>
+{% endblock %}

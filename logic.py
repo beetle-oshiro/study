@@ -68,30 +68,46 @@ def insert_to_db(name, message, category, time):
 
 # =========================登録処理（データがあるか？ある場合は登録）PostgreSQL版 =========================
 def register_record_to_postgres(form):
-    name = form.get("name", "").strip()
-    message = form.get("message", "").strip()
-    category = form.get("category", "").strip()
+    word = form.get("word", "").strip()
+    details = form.get("details", "").strip()
+    status = form.get("status", "").strip()
+    memo = form.get("memo", "").strip()
     error = ""
+    tag_ids = form.getlist("tags")  # ← ここが複数受け取り！
 
-    if not name or not message or not category:
-        error = "すべての項目を入力してください！"
-        return name, message, category, error
+    if not word:
+        error = "ワードは必須項目です！"
+        return word, details, tag_ids, status, memo, error
 
     time_str = datetime.now().strftime("%Y-%m-%d %H:%M")
 
     try:
         conn = get_connection()
         cur = conn.cursor()
+
+        # 学習内容の登録
         cur.execute("""
-            INSERT INTO records (name, message, category, time)
-            VALUES (%s, %s, %s, %s)
-        """, (name, message, category, time_str))
+            INSERT INTO records (word, details, tags, status, memo, created_at)
+            VALUES (%s, %s, NULL, %s, %s, %s)
+            RETURNING id
+        """, (word, details, status, memo, time_str))
+
+        record_id = cur.fetchone()[0]  # ← 登録されたIDを取得
+
+        # タグの関連付け（record_tags に保存）
+        for tag_id in tag_ids:
+            cur.execute("""
+                INSERT INTO record_tags (record_id, tag_id)
+                VALUES (%s, %s)
+            """, (record_id, tag_id))
+
         conn.commit()
         conn.close()
+
     except Exception as e:
         error = f"登録中にエラーが発生しました：{e}"
 
-    return name, message, category, error
+    return word, details, tag_ids, status, memo, error
 
 
 
@@ -100,7 +116,16 @@ def register_record_to_postgres(form):
 def get_all_records_postgres():
     conn = get_connection()
     cur = conn.cursor()
-    cur.execute("SELECT id, name, message, category, time FROM records")  # テーブル名は今まで通り"records"
+
+     # レコードとタグをJOINで取得
+    cur.execute("""
+        SELECT r.id, r.word, r.details, r.status, r.memo, r.created_at,
+               t.tag_name
+        FROM records r
+        LEFT JOIN record_tags rt ON r.id = rt.record_id
+        LEFT JOIN tags t ON rt.tag_id = t.id
+        ORDER BY r.created_at DESC
+    """)    
     rows = cur.fetchall()
     conn.close()
 
@@ -108,12 +133,20 @@ def get_all_records_postgres():
     result = {}
     for row in rows:
         record_id = str(row[0])
-        result[record_id] = {
-            "name": row[1],
-            "message": row[2],
-            "category": row[3],
-            "time": row[4]
-        }
+        if record_id not in result:
+            result[record_id] = {
+                "word": row[1],
+                "details": row[2],
+                "status": row[3],
+                "memo": row[4],
+                "time": row[5],
+                "tags": []
+            }
+
+        # タグが存在する場合のみ追加（NULL対策）
+        if row[6]:
+            result[record_id]["tags"].append(row[6])
+
     return result
 
 
@@ -201,39 +234,74 @@ def update_record_in_db(record_id, name, category, message, time):
 def get_record_by_id_postgres(record_id):
     conn = get_connection()
     cur = conn.cursor()
-    cur.execute("SELECT id, name, message, category, time FROM records WHERE id = %s", (record_id,))
+
+    # メイン情報（word, detailsなど）
+    cur.execute("""
+        SELECT id, word, details, status, memo, created_at
+        FROM records
+        WHERE id = %s
+    """, (record_id,))
     row = cur.fetchone()
+
+    if not row:
+        conn.close()
+        return None
+
+    # タグ情報を取得（tag_name のリストを作る）
+    cur.execute("""
+        SELECT t.tag_name
+        FROM tags t
+        JOIN record_tags rt ON t.id = rt.tag_id
+        WHERE rt.record_id = %s
+    """, (record_id,))
+    tag_rows = cur.fetchall()
     conn.close()
 
-    if row:
-        return {
-            "name": row[1],
-            "message": row[2],
-            "category": row[3],
-            "time": row[4]
-        }
-    else:
-        return None
+    tag_list = [tag_row[0] for tag_row in tag_rows]  # 例：['Python', 'PHP']
+
+    return {
+        "word": row[1],
+        "details": row[2],
+        "status": row[3],
+        "memo": row[4],
+        "time": row[5],
+        "tags": tag_list  # ← リストで渡す！
+    }
+
 
 
 # =========================更新処理（データベース：PostgreSQL）=========================
-def update_record_in_postgres(record_id, name, category, message, time_str):
-    # record_id = int(record_id)
+def update_record_in_postgres(record_id, word, details, tags, status, memo, time_str):
     try:
         conn = get_connection()
         cur = conn.cursor()
+
+        # records テーブルの更新（tagsカラムは使わない）
         cur.execute("""
             UPDATE records
-            SET name = %s,
-                category = %s,
-                message = %s,
-                time = %s
+            SET word = %s,
+                details = %s,
+                status = %s,
+                memo = %s,
+                created_at = %s
             WHERE id = %s
-        """, (name, category, message, time_str, record_id))
+        """, (word, details, status, memo, time_str, record_id))
+
+        # 既存のタグを削除
+        cur.execute("DELETE FROM record_tags WHERE record_id = %s", (record_id,))
+
+        # 新しいタグを登録
+        for tag_id in tags:
+            cur.execute("""
+                INSERT INTO record_tags (record_id, tag_id)
+                VALUES (%s, %s)
+            """, (record_id, tag_id))
+
         conn.commit()
         conn.close()
     except Exception as e:
         print(f"❌ 更新中にエラーが発生しました：{e}")
+
 
 
 # =========================カテゴリーの絞り込み=========================
@@ -256,10 +324,15 @@ def filter_by_keyword(data_dict, keyword):
     result = {}                             #空の辞書を用意
     keyword_lower = keyword.lower()         #指定されたキーワードを小文字にする
     for k, v in data_dict.items():          #カテゴリーで絞られたデータ（もしくは全データ）のキーと中身を取り出していく
-        name_lower = v["name"].lower()      #nameキーの値を小文字にする
-        message_lower = v["message"].lower()    #messageキーの値を小文字にする
-        if keyword_lower in name_lower or keyword_lower in message_lower:   #指定されたキーワードとname、messageの値がどちらか同じ場合
-            result[k] = v                   #該当するキーも中身（nameとmessage両方）も辞書に入れる
+        # word, details, tags の3つを検索対象にする
+        word = v.get("word", "").lower()
+        details = v.get("details", "").lower()
+        tag_list = v.get("tags", [])  # ←リストのまま取得
+        tag_str = ",".join(tag_list).lower()  # ←リストを文字列にして小文字に
+        if (keyword_lower in word or
+            keyword_lower in details or
+            keyword_lower in tag_str):
+            result[k] = v
 
     return result                           #辞書を返す
 
@@ -271,7 +344,7 @@ def sort_data(data_dict, sort_order):
     else:                                                                   #並び順でname（名前順）が選択されていない場合（つまり時間順が選択されている）
         return dict(sorted(                                                 #data_dict（全データ、もしくは絞り込まれたデータ）の中身を「時間順（降順）」で並び替えて、新しい辞書として返してる
             data_dict.items(),
-            key=lambda x: datetime.strptime(x[1]["time"], "%Y-%m-%d %H:%M"),
+            key=lambda x: x[1]["time"],
             reverse=True
         ))
 
@@ -286,3 +359,36 @@ def update_data(id, name, category, message):
             "time": datetime.now().strftime("%Y-%m-%d %H:%M")
         })
         save_json()                                             #保存
+
+
+# =========================全タグを取得（PostgreSQL）=========================
+def get_all_tags():
+    conn = get_connection()
+    cur = conn.cursor()
+    cur.execute("SELECT id, tag_name FROM tags ORDER BY tag_name")
+    rows = cur.fetchall()
+    conn.close()
+
+    result = []
+    for row in rows:
+        result.append({"id": row[0], "name": row[1]})
+    return result
+
+# =========================タグを登録（PostgreSQL）=========================
+def register_tag(tag_name):
+    try:
+        conn = get_connection()
+        cur = conn.cursor()
+        # 重複チェック
+        cur.execute("SELECT COUNT(*) FROM tags WHERE tag_name = %s", (tag_name,))
+        count = cur.fetchone()[0]
+        if count > 0:
+            return "このタグはすでに登録されています。"
+
+        # 登録処理
+        cur.execute("INSERT INTO tags (tag_name) VALUES (%s)", (tag_name,))
+        conn.commit()
+        conn.close()
+        return True
+    except Exception as e:
+        return f"データベースエラー：{e}"

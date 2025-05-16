@@ -1,0 +1,112 @@
+/* body {
+    font-family: 'Sawarabi Mincho', serif;
+} */
+
+
+/* 入力欄を幅いっぱいに */
+.form-wide {
+    width: 100%;
+    min-height: 80px;
+}
+
+/* タグと状況を横並びに */
+.row-inline {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+    margin-top: 10px;
+}
+
+.column-half {
+    flex: 1;
+    min-width: 200px;
+}
+
+
+.container {
+    max-width: 600px;
+    margin: auto;
+}
+
+h1 {
+    font-weight: bold;
+}
+
+
+/* レスポンシブ */
+/* ホーム画面のボタンの見た目を整える */
+.home-buttons a {
+    display: block;
+    font-size: 1.4rem;
+    padding: 15px;
+    margin-bottom: 15px;
+    width: 100%;
+}
+
+/* スマホサイズ向けの調整 */
+@media (max-width: 576px) {
+    .container {
+        padding: 20px;
+    }
+
+    h1 {
+        font-size: 1.8rem;
+    }
+
+    .home-buttons a {
+        font-size: 1.2rem;
+        padding: 12px;
+    }
+}
+
+
+/* アシストページの検索フォーム */
+.assist-form {
+    font-size: 1.2rem;
+    margin-bottom: 30px;
+}
+
+.assist-form label,
+.assist-form select,
+.assist-form input,
+.assist-form button {
+    margin: 8px;
+    padding: 8px;
+    font-size: 1.1rem;
+}
+
+/* カード表示エリア */
+.assist-card {
+    text-align: left;
+    font-size: 1.1rem;
+    background-color: #f9f9f9;
+    border-radius: 8px;
+}
+
+/* レスポンシブ調整 */
+@media (max-width: 576px) {
+
+    .assist-form label,
+    .assist-form select,
+    .assist-form input,
+    .assist-form button {
+        display: block;
+        width: 100%;
+        margin: 8px auto;
+    }
+
+    .assist-card {
+        font-size: 1rem;
+    }
+}
+
+.assist-form {
+    flex-wrap: wrap;
+    gap: 16px;
+    justify-content: center;
+    margin-bottom: 30px;
+}
+
+.assist-form label {
+    white-space: nowrap;
+}

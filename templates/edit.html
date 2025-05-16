@@ -3,20 +3,49 @@
 {% block title %}編集フォーム{% endblock %}
 
 {% block content %}
-<h2>編集フォーム</h2>
-<form method="POST" action="/update/{{ id }}"> <!-- 編集する（した）IDをURLに付ける -->
-  <label>名前：</label><br>
-  <input type="text" name="name" value="{{ item.name }}"><br><br> <!-- 現状（編集前）のデータをテキストボックスに入れる -->
-  <label>カテゴリー：</label>
-  <select name="category" id="id_select_category">
-    <option value="学習" {% if item.category=="学習" %}selected{% endif %}>学習</option> <!-- 現状（編集前）で選択されているカテゴリーを選択させる -->
-    <option value="雑談" {% if item.category=="雑談" %}selected{% endif %}>雑談</option> <!-- ↑に同じ -->
-    <option value="日記" {% if item.category=="日記" %}selected{% endif %}>日記</option> <!-- ↑に同じ -->
-  </select><br>
+<div class="container mt-5" style="max-width: 700px;">
+  <div class="card shadow-sm p-4 mb-4">
+    <form method="POST" action="/update/{{ id }}">
 
-  <label>メッセージ：</label><br>
-  <textarea name="message">{{ item.message }}</textarea><br><br> <!-- 現状（編集前）のデータをテキストエリアに入れる -->
+      <!-- ワード -->
+      <label for="id_text_word">ワード（必須）：</label><br>
+      <input type="text" name="word" id="id_text_word" class="form-control mb-3" value="{{ item.word }}" required>
 
-  <button type="submit">更新する</button>
-</form>
+      <!-- 詳細 -->
+      <label for="id_text_details">詳細：</label><br>
+      <textarea name="details" id="id_text_details" class="form-wide">{{ item.details }}</textarea><br><br>
+
+      <!-- タグと状況を横並びに -->
+      <div class="row-inline">
+        <div class="column-half">
+          <label for="tags">タグ（複数選択可）：</label><br>
+          <select name="tags" id="tags" multiple class="form-control">
+            {% for tag in tags %}
+            <option value="{{ tag.id }}" {% if item.tags and tag.name in item.tags %}selected{% endif %}>{{ tag.name }}
+            </option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <div class="column-half">
+          <label for="id_select_status">状況：</label><br>
+          <select name="status" id="id_select_status" class="form-control">
+            <option value="">--選択--</option>
+            <option value="未理解" {% if item.status=="未理解" %}selected{% endif %}>未理解</option>
+            <option value="復習必要" {% if item.status=="復習必要" %}selected{% endif %}>復習必要</option>
+            <option value="理解済" {% if item.status=="理解済" %}selected{% endif %}>理解済</option>
+          </select>
+        </div>
+      </div><br>
+
+      <!-- メモ -->
+      <label for="id_text_memo">メモ：</label><br>
+      <textarea name="memo" id="id_text_memo" class="form-wide">{{ item.memo }}</textarea><br><br>
+
+      <button type="submit" class="btn btn-primary w-100">更新する</button>
+    </form>
+  </div>
+
+  <a href="/" class="btn btn-secondary w-100">トップへ戻る</a>
+</div>
 {% endblock %}

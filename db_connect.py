@@ -1,11 +1,18 @@
-import psycopg2
 import os
+from dotenv import load_dotenv
+import psycopg2
 
-# 接続情報（ここは後でたーのびの本物の情報に置き換える！）
-DB_HOST = "dpg-d08bkg9r0fns73brpmjg-a.oregon-postgres.render.com"
-DB_NAME = "study_sys_db"
-DB_USER = "study_user"
-DB_PASS = "6vQNae5v64GRxT6bvNP7uSyDu1mgrFqJ"
+
+# .envファイルの読み込み
+load_dotenv()
+
+
+# .envから取得
+DB_HOST = os.getenv("DB_HOST")
+DB_NAME = os.getenv("DB_NAME")
+DB_USER = os.getenv("DB_USER")
+DB_PASSWORD = os.getenv("DB_PASSWORD")
+
 
 # 接続を作る関数
 def get_connection():
@@ -13,8 +20,8 @@ def get_connection():
         host=DB_HOST,
         dbname=DB_NAME,
         user=DB_USER,
-        password=DB_PASS,
-        sslmode="require"  # ←セキュリティ強化のため必ずつけよう！
+        password=DB_PASSWORD,
+        sslmode="require"
     )
 
 

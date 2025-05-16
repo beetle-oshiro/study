@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+
+{% block title %}学習記録フォーム{% endblock %}
+
+{% block content %}
+<div class="container mt-5" style="max-width: 700px;">
+    <div class="card shadow-sm p-4 mb-4">
+        <form method="POST">
+
+            <!-- ✅ メッセージ表示エリア（成功 & エラー）-->
+            {% if error %}
+            <div class="alert alert-danger" role="alert">
+                ⚠️ {{ error }}
+            </div>
+            {% endif %}
+
+            {% if success %}
+            <div class="alert alert-success" role="alert">
+                ✅ {{ success }}
+            </div>
+            {% endif %}
+
+            <!-- ワード -->
+            <label for="id_text_word">ワード：</label><br>
+            <input type="text" name="word" id="id_text_word" value="{{ word }}" class="form-control mb-3">
+
+            <!-- 詳細 -->
+            <label for="id_text_details">詳細：</label><br>
+            <textarea name="details" id="id_text_details" class="form-wide">{{ details }}</textarea><br><br>
+
+            <!-- タグと状況 横並び -->
+            <div class="row-inline">
+                <div class="column-half">
+                    <label for="tags">タグ（複数選択可）：</label><br>
+                    <select name="tags" id="tags" multiple class="form-control">
+                        {% for tag in tags_input %}
+                        <option value="{{ tag.id }}">{{ tag.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="column-half">
+                    <label for="id_select_status">状況：</label><br>
+                    <select name="status" id="id_select_status" class="form-control">
+                        <option value="">--選択--</option>
+                        <option value="未理解" {% if status=="未理解" %}selected{% endif %}>未理解</option>
+                        <option value="復習必要" {% if status=="復習必要" %}selected{% endif %}>復習必要</option>
+                        <option value="理解済" {% if status=="理解済" %}selected{% endif %}>理解済</option>
+                    </select>
+                </div>
+            </div><br>
+
+            <!-- メモ -->
+            <label for="id_text_memo">メモ：</label><br>
+            <textarea name="memo" id="id_text_memo" class="form-wide">{{ memo }}</textarea><br><br>
+
+            <button type="submit" class="btn btn-primary w-100">記録する</button>
+        </form>
+    </div>
+
+    <a href="/" class="btn btn-secondary w-100">トップへ戻る</a>
+</div>
+{% endblock %}

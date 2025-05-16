@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+
+{% block title %}トップメニュー{% endblock %}
+
+{% block content %}
+<div class="container mt-5 text-center">
+    <h1 class="mb-4">📚 学習記録アプリ</h1>
+
+    <div class="home-buttons">
+        <!-- 登録画面へのボタン -->
+        <a href="/register" class="btn btn-primary btn-lg mb-3">📥 登録する</a><br>
+
+        <!-- アシスト画面へのボタン -->
+        <a href="/assist" class="btn btn-success btn-lg mb-3">🔍 アシストしてもらう</a><br>
+
+        <!-- 設定画面へのボタン -->
+        <a href="/settings" class="btn btn-outline-info btn-lg">⚙️ タグの管理（設定）へ</a>
+    </div>
+
+</div>
+{% endblock %}

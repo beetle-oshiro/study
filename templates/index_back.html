@@ -1,0 +1,91 @@
+{% extends "base.html" %}
+
+{% block title %}学習記録フォーム{% endblock %}
+
+{% block content %}
+<div class="container mt-5" style="max-width: 700px;">
+    <!-- カードでフォームを囲む -->
+    <div class="card shadow-sm p-4 mb-4">
+        <form method="POST">
+            <div class="mb-3">
+                <label for="id_text_name" class="form-label">あなたの名前：</label>
+                <input type="text" class="form-control" name="name" id="id_text_name" value="{{ name }}">
+            </div>
+
+            <div class="mb-3">
+                <label for="id_select_category" class="form-label">カテゴリー：</label>
+                <select name="category" id="id_select_category" class="form-select">
+                    <option value="学習" {% if category=="学習" %}selected{% endif %}>学習</option>
+                    <option value="雑談" {% if category=="雑談" %}selected{% endif %}>雑談</option>
+                    <option value="日記" {% if category=="日記" %}selected{% endif %}>日記</option>
+                </select>
+            </div>
+
+            <div class="mb-3">
+                <label for="id_text_message" class="form-label">メッセージ：</label>
+                <textarea name="message" id="id_text_message" class="form-control">{{ message }}</textarea>
+            </div>
+
+            <div class="d-grid">
+                <button type="submit" class="btn btn-primary">記録する</button>
+            </div>
+        </form>
+    </div>
+
+    <!-- エラーメッセージ -->
+    {% if error %}
+    <div class="alert alert-danger" role="alert">
+        ⚠️ {{ error }}
+    </div>
+    {% endif %}
+
+    <h3>📚これまでの記録</h3>
+    <p><small>※このページを開いたのは：{{ timestamp }}</small></p>
+
+    <!-- フィルター・検索 -->
+    <form method="GET" action="/" class="mb-3">
+        <div class="d-flex flex-wrap gap-2">
+            <button name="filter" value="all" class="btn btn-outline-secondary">すべて</button>
+            <button name="filter" value="学習" class="btn btn-outline-secondary">学習</button>
+            <button name="filter" value="雑談" class="btn btn-outline-secondary">雑談</button>
+            <button name="filter" value="日記" class="btn btn-outline-secondary">日記</button>
+        </div>
+    </form>
+
+    <form method="GET" action="/" class="mb-3">
+        <div class="input-group">
+            <input type="text" name="keyword" class="form-control" placeholder="🔍 キーワード検索" value="{{ keyword }}">
+            <button class="btn btn-outline-primary" type="submit">検索</button>
+        </div>
+    </form>
+
+    <form method="GET" action="/" class="mb-4">
+        <input type="hidden" name="filter" value="{{ filter }}">
+        <input type="hidden" name="keyword" value="{{ keyword }}">
+        <button name="sort" value="time" class="btn btn-sm btn-outline-dark">🕒 新しい順</button>
+        <button name="sort" value="name" class="btn btn-sm btn-outline-dark">🔤 名前順</button>
+    </form>
+
+    <!-- 記録一覧 -->
+    {% if data %}
+    <ul class="list-group">
+        {% for id, item in data.items() %}
+        <li class="list-group-item">
+            <strong>{{ id }}. {{ item.name }}</strong>：{{ item.category }} - {{ item.message }}<br>
+            <small class="text-muted">送信時刻：{{ item.time }}</small>
+            <div class="mt-2">
+                <form method="POST" action="/delete/{{ id }}" style="display:inline;">
+                    <button type="submit" class="btn btn-sm btn-danger">削除</button>
+                </form>
+                <form method="GET" action="/edit/{{ id }}" style="display:inline;">
+                    <button type="submit" class="btn btn-sm btn-secondary">編集</button>
+                </form>
+            </div>
+        </li>
+        {% endfor %}
+    </ul>
+    {% else %}
+    <p>まだ記録はありません！</p>
+    {% endif %}
+</div>
+{% endblock %}
