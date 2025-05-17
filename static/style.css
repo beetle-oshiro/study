@@ -26,6 +26,7 @@
 .container {
     max-width: 600px;
     margin: auto;
+    padding-top: 20px;
 }
 
 h1 {
@@ -50,12 +51,15 @@ h1 {
     }
 
     h1 {
-        font-size: 1.8rem;
+        font-size: 2.5rem;
+        /* ← もともと 1.8rem、もっと大きく！ */
     }
 
     .home-buttons a {
-        font-size: 1.2rem;
-        padding: 12px;
+        font-size: 3rem;
+        /* ← もともと 1.2rem、2.5倍以上 */
+        padding: 24px;
+        /* ← もともと 12px、2倍以上 */
     }
 }
 
@@ -126,11 +130,8 @@ h1 {
 /* ボタンの見た目調整 */
 .home-buttons a {
     display: block;
-    /* 以前の約1.5倍以上に */
     font-size: 2rem;
-    /* 押しやすさUP */
     padding: 20px;
-    /* 間隔広めに */
     margin-bottom: 25px;
     width: 100%;
     max-width: 400px;
