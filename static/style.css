@@ -187,5 +187,9 @@ h1 {
 
 
 .ul_width {
-    padding-left: 0px;
+    padding-left: 0;
+    /* リストマークも非表示にする（必要なら） */
+    list-style-type: none;
+    /* ブラウザによっては margin も入ってることがある */
+    margin: 0;
 }
