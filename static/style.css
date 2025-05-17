@@ -50,7 +50,7 @@ h1 {
 @media (max-width: 576px) {
     .container {
         /* スマホだけ padding を少なくする */
-        padding: 40px !important;
+        padding: 30px !important;
         /* Bootstrap の mt-5 を打ち消す */
         /* margin-top: 0 !important; */
     }
