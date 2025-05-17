@@ -47,19 +47,19 @@ h1 {
 /* スマホサイズ向けの調整 */
 @media (max-width: 576px) {
     .container {
-        padding: 20px;
+        /* スマホだけ padding を少なくする */
+        padding: 5px !important;
+        /* Bootstrap の mt-5 を打ち消す */
+        margin-top: 0 !important;
     }
 
     h1 {
         font-size: 2.5rem;
-        /* ← もともと 1.8rem、もっと大きく！ */
     }
 
     .home-buttons a {
         font-size: 3rem;
-        /* ← もともと 1.2rem、2.5倍以上 */
         padding: 24px;
-        /* ← もともと 12px、2倍以上 */
     }
 }
 
