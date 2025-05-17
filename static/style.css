@@ -92,6 +92,15 @@ h1 {
     padding: 12px;
 }
 
+/* アシストページのコンテナ調整 */
+.assist-container {
+    text-align: left;
+    /* テキスト左寄せ */
+    padding-left: 16px;
+    /* 左右均等に */
+    padding-right: 16px;
+}
+
 /* レスポンシブ調整 */
 @media (max-width: 576px) {
 
@@ -104,8 +113,16 @@ h1 {
         margin: 8px auto;
     }
 
+    .assist-container {
+        padding-left: 10px;
+        padding-right: 10px;
+    }
+
     .assist-card {
         font-size: 1rem;
+        margin-left: 0;
+        margin-right: 0;
+        padding: 12px;
     }
 }
 
@@ -166,4 +183,9 @@ h1 {
     h1 {
         font-size: 1.6rem;
     }
+}
+
+
+.ul_width {
+    padding-left: 0px;
 }

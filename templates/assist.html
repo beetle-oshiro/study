@@ -3,7 +3,7 @@
 {% block title %}アシスト機能{% endblock %}
 
 {% block content %}
-<div class="container text-center">
+<div class="container assist-container">
     <h2 class="mb-4">🤖 学習アシストページ</h2>
 
     <!-- 検索フォーム -->
@@ -38,9 +38,9 @@
     <!-- 結果表示 -->
     {% if results %}
     <h3>🔎 検索結果：</h3>
-    <ul>
+    <ul class="ul_width">
         {% for id, item in results.items() %}
-        <div class="card assist-card mb-4 p-3 shadow-sm">
+        <div class="assist-card mb-4 p-3 shadow-sm">
 
             <div class="mb-2 p-2 border rounded bg-light">
                 <strong>📌 ワード：</strong><br>
