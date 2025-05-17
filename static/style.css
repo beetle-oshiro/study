@@ -126,9 +126,12 @@ h1 {
 /* ボタンの見た目調整 */
 .home-buttons a {
     display: block;
-    font-size: 1.6rem;
-    padding: 18px;
-    margin-bottom: 20px;
+    /* 以前の約1.5倍以上に */
+    font-size: 2rem;
+    /* 押しやすさUP */
+    padding: 20px;
+    /* 間隔広めに */
+    margin-bottom: 25px;
     width: 100%;
     max-width: 400px;
     margin-left: auto;
@@ -145,8 +148,8 @@ h1 {
 /* スマホ向け調整 */
 @media (max-width: 576px) {
     .home-buttons a {
-        font-size: 1.3rem;
-        padding: 14px;
+        font-size: 2.2rem;
+        padding: 25px;
     }
 
     .home-buttons a:last-child {
