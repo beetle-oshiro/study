@@ -120,7 +120,7 @@ h1 {
 
 /* container に .home がついているときだけ中央寄せ（スマホ意識） */
 .container.home {
-    min-height: 90vh;
+    /* min-height: 90vh; */
     /* 画面の9割使って上下中央へ */
     display: flex;
     flex-direction: column;
