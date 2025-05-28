@@ -92,6 +92,11 @@ h1 {
     padding: 12px;
 }
 
+/* アシストページのメモ欄の改行 */
+.memo-text {
+    white-space: pre-line;
+}
+
 /* アシストページのコンテナ調整 */
 .assist-container {
     text-align: left;
