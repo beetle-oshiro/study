@@ -6,7 +6,7 @@
 /* 入力欄を幅いっぱいに */
 .form-wide {
     width: 100%;
-    min-height: 80px;
+    min-height: 120px;
 }
 
 /* タグと状況を横並びに */
