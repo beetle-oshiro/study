@@ -4,7 +4,12 @@
 
 
 /* 入力欄を幅いっぱいに */
-.form-wide {
+.form-wide-detail {
+    width: 100%;
+    min-height: 60px;
+}
+
+.form-wide-memo {
     width: 100%;
     min-height: 120px;
 }
