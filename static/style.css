@@ -203,3 +203,12 @@ h1 {
     /* ブラウザによっては margin も入ってることがある */
     margin: 0;
 }
+
+pre {
+    background-color: #f5f5f5;
+    padding: 10px;
+    overflow-x: auto;
+    font-family: 'Courier New', monospace;
+    white-space: pre-wrap;
+    border-radius: 6px;
+}
