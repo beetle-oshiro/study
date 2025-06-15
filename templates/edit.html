@@ -48,4 +48,17 @@
 
   <a href="/" class="btn btn-secondary w-100">トップへ戻る</a>
 </div>
+
+<script>
+  window.addEventListener("DOMContentLoaded", function () {
+    CodeMirror.fromTextArea(document.getElementById('id_text_memo'), {
+      mode: 'python',
+      lineNumbers: true,
+      tabSize: 4,
+      indentUnit: 4,
+      theme: 'default'
+    });
+  });
+</script>
+
 {% endblock %}

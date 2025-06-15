@@ -52,8 +52,7 @@
 
             <!-- メモ -->
             <label for="id_text_memo">メモ：</label><br>
-            <textarea name="memo" id="id_text_memo"
-                class="form-wide-memo"><pre><code>{{ memo }}</code></pre></textarea><br><br>
+            <textarea name="memo" id="id_text_memo" class="form-wide-memo">{{ memo }}</textarea><br><br>
 
             <button type="submit" class="btn btn-primary w-100">記録する</button>
         </form>
@@ -61,4 +60,14 @@
 
     <a href="/" class="btn btn-secondary w-100">トップへ戻る</a>
 </div>
+
+<script>
+    const editor = CodeMirror.fromTextArea(document.getElementById('id_text_memo'), {
+        mode: 'python',           // 言語モード（必要に応じて変更OK）
+        lineNumbers: true,        // 行番号の表示
+        tabSize: 4,
+        indentUnit: 4,
+        theme: 'default',         // テーマ（他に"monokai"とかもある）
+    });
+</script>
 {% endblock %}

@@ -12,6 +12,9 @@
 .form-wide-memo {
     width: 100%;
     min-height: 260px;
+    display: block;
+    height: 300px;
+    /* ← これをしっかり指定してあげる！ */
 }
 
 /* タグと状況を横並びに */
@@ -211,4 +214,15 @@ pre {
     font-family: 'Courier New', monospace;
     white-space: pre-wrap;
     border-radius: 6px;
+}
+
+.CodeMirror {
+    width: 100% !important;
+    min-height: 300px;
+    border: 1px solid #ccc;
+    font-size: 1rem;
+}
+
+.CodeMirror-linenumbers {
+    width: 100%;
 }
